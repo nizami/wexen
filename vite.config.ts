@@ -1,6 +1,6 @@
-import { resolve } from "node:path";
-import dts from "vite-plugin-dts";
-import { defineConfig } from "vitest/config";
+import {resolve} from 'node:path';
+import dts from 'vite-plugin-dts';
+import {defineConfig} from 'vitest/config';
 
 const WORKSPACE_ROOT = resolve(import.meta.dirname);
 
@@ -9,7 +9,7 @@ export default defineConfig({
   envDir: WORKSPACE_ROOT,
   resolve: {
     alias: {
-      "#lib": resolve(WORKSPACE_ROOT, "src/index.ts"),
+      '#mini-web': resolve(WORKSPACE_ROOT, 'src/index.ts'),
     },
   },
   build: {
@@ -17,14 +17,25 @@ export default defineConfig({
     minify: false,
     sourcemap: true,
     lib: {
-      name: "mini-web",
-      formats: ["es"],
-      entry: resolve(WORKSPACE_ROOT, "src/index.ts"),
+      name: 'mini-web',
+      formats: ['es'],
+      entry: resolve(WORKSPACE_ROOT, 'src/index.ts'),
       fileName: () => `index.js`,
     },
     rollupOptions: {
       cache: false,
-      external: [],
+      external: [
+        'node:fs',
+        'node:http',
+        'node:https',
+        'node:os',
+        'node:path',
+        'node:url',
+        'node:util',
+        'crypto',
+        'zlib',
+        'ws',
+      ],
     },
   },
   test: {
