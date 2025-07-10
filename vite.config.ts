@@ -9,7 +9,7 @@ export default defineConfig({
   envDir: WORKSPACE_ROOT,
   resolve: {
     alias: {
-      '#mini-web': resolve(WORKSPACE_ROOT, 'src/index.ts'),
+      '#wexen': resolve(WORKSPACE_ROOT, 'src/index.ts'),
     },
   },
   build: {
@@ -17,7 +17,7 @@ export default defineConfig({
     minify: false,
     sourcemap: true,
     lib: {
-      name: 'mini-web',
+      name: 'wexen',
       formats: ['es'],
       entry: resolve(WORKSPACE_ROOT, 'src/index.ts'),
       fileName: () => `index.js`,

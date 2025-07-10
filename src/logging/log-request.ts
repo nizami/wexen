@@ -1,4 +1,4 @@
-import {HttpRequest, HttpResponse, logger, LogLevel, None, TerminalColor} from '#mini-web';
+import {HttpRequest, HttpResponse, logger, LogLevel, None, TerminalColor} from '#wexen';
 
 export function logRequest(
   level: LogLevel,

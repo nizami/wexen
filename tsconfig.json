@@ -23,7 +23,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "#mini-web": ["src/*", "src/index"]
+      "#wexen": ["src/*", "src/index"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

@@ -1,4 +1,4 @@
-import {$HttpHeaders, HttpHeaderList, HttpHeaders, None} from '#mini-web';
+import {$HttpHeaders, HttpHeaderList, HttpHeaders, None} from '#wexen';
 
 export function newHttpHeaders(items: HttpHeaderList & Record<string, string | string[]>): HttpHeaders {
   return {

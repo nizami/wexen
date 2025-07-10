@@ -1,4 +1,4 @@
-import {$WebType, contentTypeFromExtension, HttpResponse, newHttpHeaders} from '#mini-web';
+import {$WebType, contentTypeFromExtension, HttpResponse, newHttpHeaders} from '#wexen';
 import {readFileSync} from 'node:fs';
 import {IncomingMessage, ServerResponse} from 'node:http';
 import {Brand} from 'rtt';

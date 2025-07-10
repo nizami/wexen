@@ -1,4 +1,4 @@
-import {HttpRequest, HttpResponse, newFileHttpResponse, newJsonHttpResponse, None} from '#mini-web';
+import {HttpRequest, HttpResponse, newFileHttpResponse, newJsonHttpResponse, None} from '#wexen';
 import {existsSync, statSync} from 'node:fs';
 import {resolve} from 'node:path';
 

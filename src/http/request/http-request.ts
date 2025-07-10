@@ -1,4 +1,4 @@
-import {$WebType, HttpHeaders, HttpMethod} from '#mini-web';
+import {$WebType, HttpHeaders, HttpMethod} from '#wexen';
 import {Brand, Model} from 'rtt';
 import {UrlWithParsedQuery} from 'url';
 

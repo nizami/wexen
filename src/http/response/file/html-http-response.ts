@@ -1,4 +1,4 @@
-import {$WebType, HttpResponse, newHttpHeaders} from '#mini-web';
+import {$WebType, HttpResponse, newHttpHeaders} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
 import {Brand} from 'rtt';
 import {gzip} from 'zlib';

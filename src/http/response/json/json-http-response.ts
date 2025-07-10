@@ -1,4 +1,4 @@
-import {$WebType, HttpResponse, HttpStatusCode, newHttpHeaders} from '#mini-web';
+import {$WebType, HttpResponse, HttpStatusCode, newHttpHeaders} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
 import {Brand} from 'rtt';
 

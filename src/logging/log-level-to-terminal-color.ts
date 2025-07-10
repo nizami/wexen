@@ -1,4 +1,4 @@
-import {LogLevel, TerminalColor} from '#mini-web';
+import {LogLevel, TerminalColor} from '#wexen';
 
 export function logLevelToTerminalColor(level: LogLevel): TerminalColor {
   switch (level) {

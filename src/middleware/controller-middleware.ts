@@ -5,7 +5,7 @@ import {
   None,
   resolveControllerRoute,
   resolveRouteResponse,
-} from '#mini-web';
+} from '#wexen';
 
 export function controllerMiddleware(
   routes: HttpControllerRoute[],

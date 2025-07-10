@@ -1,4 +1,4 @@
-import {$HttpRequest, HttpMethod, HttpRequest, newHttpHeaders} from '#mini-web';
+import {$HttpRequest, HttpMethod, HttpRequest, newHttpHeaders} from '#wexen';
 import {IncomingMessage} from 'node:http';
 import {parse} from 'node:url';
 

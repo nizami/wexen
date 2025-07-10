@@ -1,4 +1,4 @@
-import {HttpControllerRoute, HttpRequest, HttpResponse, newJsonHttpResponse, None} from '#mini-web';
+import {HttpControllerRoute, HttpRequest, HttpResponse, newJsonHttpResponse, None} from '#wexen';
 
 export function resolveControllerRoute(
   routes: HttpControllerRoute[],

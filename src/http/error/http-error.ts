@@ -1,4 +1,4 @@
-import {$WebType, HttpStatusCode} from '#mini-web';
+import {$WebType, HttpStatusCode} from '#wexen';
 import {Brand, Model} from 'rtt';
 
 export type HttpError = Model &

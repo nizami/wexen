@@ -1,5 +1,5 @@
 {
-  "name": "mini-web",
+  "name": "wexen",
   "version": "1.0.0",
   "description": "Mini web",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nizami/mini-web.git"
+    "url": "git+https://github.com/nizami/wexen.git"
   },
   "keywords": [
     "Web",
@@ -19,9 +19,9 @@
   "author": "Nizami",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nizami/mini-web/issues"
+    "url": "https://github.com/nizami/wexen/issues"
   },
-  "homepage": "https://github.com/nizami/mini-web#readme",
+  "homepage": "https://github.com/nizami/wexen#readme",
   "devDependencies": {
     "@types/node": "^24.0.10",
     "@types/ws": "^8.18.1",

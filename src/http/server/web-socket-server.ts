@@ -1,4 +1,4 @@
-import {logger} from '#mini-web';
+import {logger} from '#wexen';
 import {Server} from 'node:https';
 import {WebSocket, WebSocketServer} from 'ws';
 

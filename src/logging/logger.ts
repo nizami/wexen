@@ -1,4 +1,4 @@
-import {LogLevel, logLevelToTerminalColor, None, terminalColor, TerminalColor} from '#mini-web';
+import {LogLevel, logLevelToTerminalColor, None, terminalColor, TerminalColor} from '#wexen';
 import util from 'node:util';
 
 export const logger = {

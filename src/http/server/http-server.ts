@@ -12,7 +12,7 @@ import {
   None,
   staticFilesMiddleware,
   TerminalColor,
-} from '#mini-web';
+} from '#wexen';
 import {existsSync, readFileSync} from 'node:fs';
 import http, {IncomingMessage, ServerResponse} from 'node:http';
 import https from 'node:https';

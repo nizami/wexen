@@ -1,4 +1,4 @@
-import {HttpControllerRoute} from '#mini-web';
+import {HttpControllerRoute} from '#wexen';
 
 export type HttpController = {
   path: string;

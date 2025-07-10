@@ -1,4 +1,4 @@
-import {HttpMethod, HttpRequest, HttpResponse, None} from '#mini-web';
+import { HttpMethod, HttpRequest, HttpResponse, None } from '#wexen';
 
 export type HttpControllerRoute = {
   path?: string | None;
