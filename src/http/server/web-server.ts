@@ -9,7 +9,6 @@ import {
   logRequest,
   Middleware,
   newHttpRequest,
-  newJsonResponse,
   newNotFoundResponse,
   TerminalColor,
   WebServerConfig,
@@ -22,7 +21,7 @@ import {resolve} from 'node:path';
 
 export function runWebServer(config: WebServerConfig): {httpServer: http.Server; httpsServer: https.Server} {
   const httpsOptions: https.ServerOptions = {
-    ...getCertificate(),
+    // ...getCertificate(),
   };
 
   const routes = config.controllers.flatMap((controller) =>

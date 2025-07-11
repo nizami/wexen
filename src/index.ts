@@ -6,7 +6,7 @@ export * from './http/error/http-error';
 export * from './http/headers/http-headers.factory';
 export * from './http/headers/http-headers';
 export * from './http/http-method';
-export * from './http/http-status';
+export * from './http/http-status-code';
 export * from './http/request/http-request.factory';
 export * from './http/request/http-request';
 export * from './http/response/file/file-response';
