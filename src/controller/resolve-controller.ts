@@ -1,9 +1,6 @@
-import {HttpControllerRoute, HttpRequest, HttpResponse, newJsonHttpResponse, None} from '#wexen';
+import {HttpEndpoint, HttpMethod, HttpRequest, HttpResponse, newJsonHttpResponse, None} from '#wexen';
 
-export function resolveControllerRoute(
-  routes: HttpControllerRoute[],
-  request: HttpRequest,
-): HttpControllerRoute | None {
+export function resolveControllerRoute(routes: HttpEndpoint[], request: HttpRequest): HttpEndpoint | None {
   const pathname = request.url.pathname?.toLowerCase();
 
   if (!pathname) {
@@ -13,14 +10,17 @@ export function resolveControllerRoute(
   return routes.find((x) => x.path === pathname);
 }
 
-export function resolveRouteResponse(route: HttpControllerRoute, request: HttpRequest): HttpResponse | None {
+export async function resolveEndpointResponse(
+  endpoint: HttpEndpoint,
+  request: HttpRequest,
+): Promise<HttpResponse | None> {
   if (!request.method) {
     return null;
   }
 
   // const {query} = request.url;
 
-  const method = route[request.method];
+  const method = endpoint[request.method];
 
   if (!method) {
     return newJsonHttpResponse({message: 'Not Found'}, 404);
@@ -34,5 +34,15 @@ export function resolveRouteResponse(route: HttpControllerRoute, request: HttpRe
   //   return newJsonHttpResponse({message: 'Bad Request'}, 400);
   // }
 
-  return method.apply(route, [request]);
+  const data = await getData(request);
+
+  return method.apply(endpoint, [data, request]);
+}
+
+async function getData(request: HttpRequest): Promise<unknown> {
+  if (request.method === HttpMethod.Get || request.method === HttpMethod.Head) {
+    return request.url.query;
+  }
+
+  return request.json();
 }

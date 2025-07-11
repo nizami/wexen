@@ -1,17 +1,17 @@
 import {
   controllerMiddleware,
-  HttpController,
   HttpRequest,
   HttpResponse,
+  HttpStatusCode,
+  joinUrl,
   logger,
   LogLevel,
   logRequest,
   Middleware,
   newHttpRequest,
   newJsonHttpResponse,
-  None,
-  staticFilesMiddleware,
   TerminalColor,
+  WebServerConfig,
 } from '#wexen';
 import {existsSync, readFileSync} from 'node:fs';
 import http, {IncomingMessage, ServerResponse} from 'node:http';
@@ -19,26 +19,23 @@ import https from 'node:https';
 import {networkInterfaces} from 'node:os';
 import {resolve} from 'node:path';
 
-export type WebServerConfig = {
-  httpPort: number;
-  httpsPort: number;
-  controllers: HttpController[];
-  staticFilesPath: string;
-};
-
 export function runWebServer(config: WebServerConfig): {httpServer: http.Server; httpsServer: https.Server} {
   const httpsOptions: https.ServerOptions = {
     ...getCertificate(),
   };
 
   const routes = config.controllers.flatMap((controller) =>
-    controller.routes.map((route) => ({
+    controller.endpoints.map((route) => ({
       ...route,
       path: '/' + joinUrl(controller.path, route.path).toLowerCase(),
     })),
   );
 
-  const middlewares = [controllerMiddleware(routes), staticFilesMiddleware(config.staticFilesPath)];
+  const middlewares = [controllerMiddleware(routes)];
+
+  if (config.staticFilesMiddleware) {
+    middlewares.push(config.staticFilesMiddleware);
+  }
 
   logger.info(`Web server is running:`, TerminalColor.FG_GREEN);
   logger.info(`-`.repeat(24), TerminalColor.FG_GREEN);
@@ -69,11 +66,11 @@ function serverListener(middlewares: Middleware[]) {
       }
 
       const request = newHttpRequest(req);
-      const response = middlewareResponse(middlewares, request);
+      const response = await middlewareResponse(middlewares, request);
 
       await response.send(req, res);
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (isSuccessfulStatusCode(response.statusCode)) {
         logRequest(LogLevel.Info, request, response, null, TerminalColor.FG_GREEN);
       } else {
         logRequest(LogLevel.Error, request, response);
@@ -89,9 +86,9 @@ function serverListener(middlewares: Middleware[]) {
   };
 }
 
-function middlewareResponse(middlewares: Middleware[], request: HttpRequest): HttpResponse {
+async function middlewareResponse(middlewares: Middleware[], request: HttpRequest): Promise<HttpResponse> {
   for (const middleware of middlewares) {
-    const response = middleware(request);
+    const response = await middleware(request);
 
     if (response) {
       return response;
@@ -130,9 +127,6 @@ function getCertificate(): {cert: Buffer; key: Buffer} | undefined {
   logger.error(`Certificate not found`);
 }
 
-function joinUrl(...parts: (string | None)[]): string {
-  return parts
-    .flatMap((x) => x?.split('/'))
-    .filter((x) => !!x)
-    .join('/');
+function isSuccessfulStatusCode(statusCode: HttpStatusCode): boolean {
+  return statusCode >= 200 && statusCode < 300;
 }

@@ -1,11 +1,14 @@
-import { HttpMethod, HttpRequest, HttpResponse, None } from '#wexen';
+import {HttpMethod, HttpRequest, HttpResponse, None} from '#wexen';
 
-export type HttpControllerRoute = {
+export type HttpEndpoint = {
   path?: string | None;
-  [HttpMethod.Delete]?: (request: HttpRequest) => HttpResponse;
-  [HttpMethod.Get]?: (request: HttpRequest) => HttpResponse;
-  [HttpMethod.Head]?: (request: HttpRequest) => HttpResponse;
-  [HttpMethod.Patch]?: (request: HttpRequest) => HttpResponse;
-  [HttpMethod.Post]?: (request: HttpRequest) => HttpResponse;
-  [HttpMethod.Put]?: (request: HttpRequest) => HttpResponse;
+  version?: string | None;
+  tags?: string[] | None;
+  [HttpMethod.Delete]?: (data: any, request: HttpRequest) => HttpResponse;
+  [HttpMethod.Get]?: (data: any, request: HttpRequest) => HttpResponse;
+  [HttpMethod.Head]?: (data: any, request: HttpRequest) => HttpResponse;
+  [HttpMethod.Options]?: (data: any, request: HttpRequest) => HttpResponse;
+  [HttpMethod.Patch]?: (data: any, request: HttpRequest) => HttpResponse;
+  [HttpMethod.Post]?: (data: any, request: HttpRequest) => HttpResponse;
+  [HttpMethod.Put]?: (data: any, request: HttpRequest) => HttpResponse;
 };

@@ -3,7 +3,7 @@ import {Brand, Model} from 'rtt';
 
 export type HttpHeaders = Model &
   Brand<'Web.HttpHeaders'> & {
-    items: HttpHeaderList & Record<string, string | string[]>;
+    items: HttpHeaderList & Record<string, string | string[] | undefined>;
 
     get(key: string): string | string[] | None;
     set(key: string, value: string | string[] | None): void;

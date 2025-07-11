@@ -1,6 +1,8 @@
 import {$HttpHeaders, HttpHeaderList, HttpHeaders, None} from '#wexen';
 
-export function newHttpHeaders(items: HttpHeaderList & Record<string, string | string[]>): HttpHeaders {
+export function newHttpHeaders(
+  items: HttpHeaderList & Record<string, undefined | string | string[]>,
+): HttpHeaders {
   return {
     $type: $HttpHeaders(),
     items,

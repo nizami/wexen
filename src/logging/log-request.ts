@@ -10,7 +10,8 @@ export function logRequest(
   const statusCodeText = String(response.statusCode).padStart(3, '0');
   const methodText = request.method.padEnd(6, ' ');
   const messageText = message ? ' ' + message : '';
-  const ip = `${request.remoteAddress.replace('::ffff:', '')}`.padEnd(16, ' ');
+  const remoteAddress = request.remoteAddress ?? '<unknown>';
+  const ip = remoteAddress.replace('::ffff:', '').padEnd(16, ' ');
 
-  logger[level](`${ip} ${statusCodeText} ${methodText} ${request.originalUrl}${messageText}`, color);
+  logger[level](`${ip} ${statusCodeText} ${methodText} ${request.url.href}${messageText}`, color);
 }
