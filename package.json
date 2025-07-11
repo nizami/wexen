@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/nizami/wexen#readme",
   "devDependencies": {
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.13",
     "@types/ws": "^8.18.1",
     "barrelize": "^1.6.2",
     "rtt": "^1.0.1",
