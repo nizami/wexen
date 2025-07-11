@@ -3,7 +3,6 @@ import {
   HttpRequest,
   HttpResponse,
   HttpStatusCode,
-  joinUrl,
   logger,
   LogLevel,
   logRequest,
@@ -24,14 +23,11 @@ export function runWebServer(config: WebServerConfig): {httpServer: http.Server;
     // ...getCertificate(),
   };
 
-  const routes = config.controllers.flatMap((controller) =>
-    controller.routes.map((route) => ({
-      ...route,
-      path: '/' + joinUrl(controller.path, route.path).toLowerCase(),
-    })),
-  );
+  const middlewares: Middleware[] = [];
 
-  const middlewares = [controllerMiddleware(routes)];
+  if (config.controllers) {
+    middlewares.push(controllerMiddleware(config.controllers));
+  }
 
   if (config.staticFilesMiddleware) {
     middlewares.push(config.staticFilesMiddleware);

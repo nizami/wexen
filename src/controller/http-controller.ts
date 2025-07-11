@@ -1,6 +1,6 @@
-import {HttpRoute} from '#wexen';
+import {HttpControllerRoute} from '#wexen';
 
 export type HttpController = {
   path: string;
-  routes: HttpRoute[];
+  routes: HttpControllerRoute[];
 };
