@@ -1,5 +1,5 @@
-export * from './controller/http-controller-route';
 export * from './controller/http-controller';
+export * from './controller/http-endpoint';
 export * from './controller/resolve-controller';
 export * from './http/error/http-error.factory';
 export * from './http/error/http-error';
