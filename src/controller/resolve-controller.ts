@@ -1,6 +1,6 @@
-import {HttpEndpoint, HttpMethod, HttpRequest, HttpResponse, newJsonResponse, None} from '#wexen';
+import {HttpMethod, HttpRequest, HttpResponse, HttpRoute, newNotFoundResponse, None} from '#wexen';
 
-export function resolveControllerRoute(routes: HttpEndpoint[], request: HttpRequest): HttpEndpoint | None {
+export function resolveRoute(routes: HttpRoute[], request: HttpRequest): HttpRoute | None {
   const pathname = request.url.pathname?.toLowerCase();
 
   if (!pathname) {
@@ -10,36 +10,26 @@ export function resolveControllerRoute(routes: HttpEndpoint[], request: HttpRequ
   return routes.find((x) => x.path === pathname);
 }
 
-export async function resolveEndpointResponse(
-  endpoint: HttpEndpoint,
+export async function resolveRouteResponse(
+  route: HttpRoute,
   request: HttpRequest,
 ): Promise<HttpResponse | None> {
   if (!request.method) {
     return null;
   }
 
-  // const {query} = request.url;
-
-  const method = endpoint[request.method];
+  const method = route[request.method];
 
   if (!method) {
-    return newJsonResponse({message: 'Not Found'}, 404);
+    return newNotFoundResponse();
   }
 
-  // const parameters = getFunctionParameters(method);
-  // const values = parameters.map((x) => query[x]);
+  const data = await getRequestData(request);
 
-  // // todo validate params also
-  // if (parameters.length !== values.length) {
-  //   return newJsonHttpResponse({message: 'Bad Request'}, 400);
-  // }
-
-  const data = await getData(request);
-
-  return method.apply(endpoint, [data, request]);
+  return method.apply(route, [data, request]);
 }
 
-async function getData(request: HttpRequest): Promise<unknown> {
+async function getRequestData(request: HttpRequest): Promise<unknown> {
   if (request.method === HttpMethod.Get || request.method === HttpMethod.Head) {
     return request.url.query;
   }

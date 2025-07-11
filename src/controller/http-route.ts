@@ -1,6 +1,6 @@
 import {HttpMethod, HttpRequest, HttpResponse, None} from '#wexen';
 
-export type HttpEndpoint = {
+export type HttpRoute = {
   path?: string | None;
   version?: string | None;
   tags?: string[] | None;

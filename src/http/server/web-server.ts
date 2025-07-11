@@ -10,6 +10,7 @@ import {
   Middleware,
   newHttpRequest,
   newJsonResponse,
+  newNotFoundResponse,
   TerminalColor,
   WebServerConfig,
 } from '#wexen';
@@ -25,7 +26,7 @@ export function runWebServer(config: WebServerConfig): {httpServer: http.Server;
   };
 
   const routes = config.controllers.flatMap((controller) =>
-    controller.endpoints.map((route) => ({
+    controller.routes.map((route) => ({
       ...route,
       path: '/' + joinUrl(controller.path, route.path).toLowerCase(),
     })),
@@ -95,7 +96,7 @@ async function middlewareResponse(middlewares: Middleware[], request: HttpReques
     }
   }
 
-  return newJsonResponse({message: 'Not Found'}, 404);
+  return newNotFoundResponse();
 }
 
 function logListening(protocol: string, port: number): void {

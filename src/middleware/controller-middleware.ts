@@ -1,21 +1,21 @@
 import {
-  HttpEndpoint,
   HttpRequest,
   HttpResponse,
+  HttpRoute,
   Middleware,
   None,
-  resolveControllerRoute,
-  resolveEndpointResponse,
+  resolveRoute,
+  resolveRouteResponse,
 } from '#wexen';
 
-export function controllerMiddleware(routes: HttpEndpoint[]): Middleware {
+export function controllerMiddleware(routes: HttpRoute[]): Middleware {
   return async (request: HttpRequest): Promise<HttpResponse | None> => {
-    const route = resolveControllerRoute(routes, request);
+    const route = resolveRoute(routes, request);
 
     if (!route) {
       return null;
     }
 
-    return resolveEndpointResponse(route, request);
+    return resolveRouteResponse(route, request);
   };
 }
