@@ -3,8 +3,8 @@ import {
   HttpResponse,
   HttpStatusCode,
   Middleware,
-  newFileHttpResponse,
-  newJsonHttpResponse,
+  newFileResponse,
+  newJsonResponse,
   None,
 } from '#wexen';
 import {existsSync, statSync} from 'node:fs';
@@ -18,10 +18,10 @@ export function staticFilesMiddleware(staticFileDirectories: string[]): Middlewa
       const path = resolve(directory, requestPath);
 
       if (path && existsSync(path) && statSync(path).isFile()) {
-        return newFileHttpResponse(path);
+        return newFileResponse(path);
       }
     }
 
-    return newJsonHttpResponse({message: `Not Found '${requestPath}'`}, HttpStatusCode.NotFound);
+    return newJsonResponse({message: `Not Found '${requestPath}'`}, HttpStatusCode.NotFound);
   };
 }

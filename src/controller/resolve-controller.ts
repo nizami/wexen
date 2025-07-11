@@ -1,4 +1,4 @@
-import {HttpEndpoint, HttpMethod, HttpRequest, HttpResponse, newJsonHttpResponse, None} from '#wexen';
+import {HttpEndpoint, HttpMethod, HttpRequest, HttpResponse, newJsonResponse, None} from '#wexen';
 
 export function resolveControllerRoute(routes: HttpEndpoint[], request: HttpRequest): HttpEndpoint | None {
   const pathname = request.url.pathname?.toLowerCase();
@@ -23,7 +23,7 @@ export async function resolveEndpointResponse(
   const method = endpoint[request.method];
 
   if (!method) {
-    return newJsonHttpResponse({message: 'Not Found'}, 404);
+    return newJsonResponse({message: 'Not Found'}, 404);
   }
 
   // const parameters = getFunctionParameters(method);

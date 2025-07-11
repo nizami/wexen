@@ -1,25 +1,18 @@
-import {$WebType, contentTypeFromExtension, HttpResponse, newHttpHeaders} from '#wexen';
-import {readFileSync} from 'node:fs';
+import {$WebType, HttpResponse, newHttpHeaders} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
 import {Brand} from 'rtt';
 import {gzip} from 'zlib';
 
-export type FileHttpResponse = HttpResponse &
-  Brand<'Web.FileHttpResponse'> & {
-    readonly filePath: string;
-  };
+export type HtmlResponse = HttpResponse & Brand<'Web.HtmlResponse'> & {};
 
-export const $FileHttpResponse = () => $WebType<FileHttpResponse>('FileHttpResponse');
+export const $HtmlResponse = () => $WebType<HtmlResponse>('HtmlResponse');
 
-export function newFileHttpResponse(filePath: string, statusCode: number = 200): FileHttpResponse {
-  const pathExtension = filePath.split('.').pop()?.toLowerCase() || '';
-
+export function newHtmlResponse(html: string | Buffer, statusCode: number = 200): HtmlResponse {
   return {
-    $type: $FileHttpResponse(),
+    $type: $HtmlResponse(),
     statusCode,
-    headers: newHttpHeaders({'content-type': contentTypeFromExtension(pathExtension)}),
-    body: readFileSync(filePath),
-    filePath,
+    headers: newHttpHeaders({'content-type': 'text/html'}),
+    body: html,
 
     async send(request: IncomingMessage, response: ServerResponse): Promise<void> {
       const acceptEncoding = request.headers['accept-encoding'];
@@ -35,6 +28,7 @@ export function newFileHttpResponse(filePath: string, statusCode: number = 200):
           }
 
           response.setHeader('Content-Encoding', 'gzip');
+          response.setHeader('Content-Type', 'text/html');
           response.writeHead(response.statusCode, this.headers.items);
           response.end(compressedData);
         });

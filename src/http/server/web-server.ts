@@ -9,7 +9,7 @@ import {
   logRequest,
   Middleware,
   newHttpRequest,
-  newJsonHttpResponse,
+  newJsonResponse,
   TerminalColor,
   WebServerConfig,
 } from '#wexen';
@@ -95,7 +95,7 @@ async function middlewareResponse(middlewares: Middleware[], request: HttpReques
     }
   }
 
-  return newJsonHttpResponse({message: 'Not Found'}, 404);
+  return newJsonResponse({message: 'Not Found'}, 404);
 }
 
 function logListening(protocol: string, port: number): void {
