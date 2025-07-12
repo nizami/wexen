@@ -1,7 +1,6 @@
 export * from './controller/http-controller-method';
 export * from './controller/http-controller-route';
 export * from './controller/http-controller';
-export * from './controller/invoke-controller-method';
 export * from './http/error/http-error.factory';
 export * from './http/error/http-error';
 export * from './http/headers/http-headers.factory';
