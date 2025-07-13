@@ -71,12 +71,9 @@ function serverListener(middlewares: Middleware[]) {
       await response.send(req, res);
 
       const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
+      const logLevel = isSuccessfulStatusCode(response.statusCode) ? LogLevel.Info : LogLevel.Error;
 
-      if (isSuccessfulStatusCode(response.statusCode)) {
-        logRequest(LogLevel.Info, request, response, humanizedTime, TerminalColor.FG_GREEN);
-      } else {
-        logRequest(LogLevel.Error, request, response, humanizedTime);
-      }
+      logRequest(logLevel, req, response.statusCode, humanizedTime);
     } catch (err: any) {
       const error =
         err instanceof HttpError ? err : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
@@ -86,12 +83,7 @@ function serverListener(middlewares: Middleware[]) {
       res.end(JSON.stringify({error: error.message}));
 
       const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
-
-      logger.error(
-        `${error.statusCode} ${req.method} ${req.url} ${humanizedTime} ip: ${
-          req.socket.remoteAddress
-        } ${String(err['stack'] ?? err)}`,
-      );
+      logRequest(LogLevel.Error, req, error.statusCode, `${humanizedTime}\n${String(err['stack'] ?? err)}`);
     }
   };
 }
