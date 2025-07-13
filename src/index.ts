@@ -25,5 +25,6 @@ export * from './middleware/static-files/static-files-middleware';
 export * from './typing';
 export * from './util/array';
 export * from './util/content-type-from-extension';
+export * from './util/humanize-time/humanize-time';
 export * from './util/join-url';
 export * from './util/terminal-color';

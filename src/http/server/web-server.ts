@@ -4,6 +4,7 @@ import {
   HttpRequest,
   HttpResponse,
   HttpStatusCode,
+  humanizeTime,
   logger,
   LogLevel,
   logRequest,
@@ -53,6 +54,8 @@ export function runWebServer(config: WebServerConfig): {httpServer: http.Server;
 
 function serverListener(middlewares: Middleware[]) {
   return async (req: IncomingMessage, res: ServerResponse) => {
+    const performanceTime = process.hrtime.bigint();
+
     try {
       if (!req.url) {
         throw new Error('URL Not Found');
@@ -67,25 +70,27 @@ function serverListener(middlewares: Middleware[]) {
 
       await response.send(req, res);
 
+      const humanizedTime = humanizeTime( process.hrtime.bigint() - performanceTime);
+
       if (isSuccessfulStatusCode(response.statusCode)) {
-        logRequest(LogLevel.Info, request, response, null, TerminalColor.FG_GREEN);
+        logRequest(LogLevel.Info, request, response, humanizedTime, TerminalColor.FG_GREEN);
       } else {
-        logRequest(LogLevel.Error, request, response);
+        logRequest(LogLevel.Error, request, response, humanizedTime);
       }
     } catch (err: any) {
       const error =
-        err instanceof HttpError
-          ? err
-          : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
+        err instanceof HttpError ? err : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
 
       res.writeHead(error.statusCode, {'Content-Type': 'application/json'});
       // todo don't use stringify
       res.end(JSON.stringify({error: error.message}));
 
+      const humanizedTime = humanizeTime( process.hrtime.bigint() - performanceTime);
+
       logger.error(
-        `${error.statusCode} ${req.method} ${req.url} ip: ${req.socket.remoteAddress} ${String(
-          err['stack'] ?? err,
-        )}`,
+        `${error.statusCode} ${req.method} ${req.url} ${humanizedTime} ip: ${
+          req.socket.remoteAddress
+        } ${String(err['stack'] ?? err)}`,
       );
     }
   };
