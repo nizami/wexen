@@ -1,16 +1,12 @@
-import {$WebType, HttpResponse, HttpStatusCode, newHttpHeaders, None} from '#wexen';
+import {HttpResponse, HttpStatusCode, newHttpHeaders, None} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
-import {Brand} from 'rtt';
 
 const notFoundMessage = JSON.stringify({message: 'Not Found'});
 
-export type NotFoundResponse = HttpResponse & Brand<'Web.NotFoundResponse'> & {};
-
-export const $NotFoundResponse = () => $WebType<NotFoundResponse>('NotFoundResponse');
+export type NotFoundResponse = HttpResponse & {};
 
 export function newNotFoundResponse(value?: unknown | None): NotFoundResponse {
   return {
-    $type: $NotFoundResponse(),
     statusCode: HttpStatusCode.NotFound,
     headers: newHttpHeaders({'content-type': 'application/json'}),
     body: value ? JSON.stringify(value) : notFoundMessage,

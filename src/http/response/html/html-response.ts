@@ -1,15 +1,11 @@
-import {$WebType, HttpResponse, newHttpHeaders} from '#wexen';
+import {HttpResponse, newHttpHeaders} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
-import {Brand} from 'rtt';
 import {gzip} from 'zlib';
 
-export type HtmlResponse = HttpResponse & Brand<'Web.HtmlResponse'> & {};
-
-export const $HtmlResponse = () => $WebType<HtmlResponse>('HtmlResponse');
+export type HtmlResponse = HttpResponse & {};
 
 export function newHtmlResponse(html: string | Buffer, statusCode: number = 200): HtmlResponse {
   return {
-    $type: $HtmlResponse(),
     statusCode,
     headers: newHttpHeaders({'content-type': 'text/html'}),
     body: html,

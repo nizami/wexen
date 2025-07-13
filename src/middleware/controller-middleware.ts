@@ -1,15 +1,16 @@
 import {
-  HttpController,
+  Controller,
+  findMap,
   HttpMethod,
   HttpRequest,
   HttpResponse,
   joinUrl,
   logger,
-  Middleware,
   None,
+  ServerMiddleware,
 } from '#wexen';
 
-export function controllerMiddleware(controllers: HttpController[]): Middleware {
+export function controllerMiddleware(controllers: Controller[]): ServerMiddleware {
   if (controllers.length === 0) {
     logger.warn('No controllers in middleware');
 
@@ -33,9 +34,11 @@ export function controllerMiddleware(controllers: HttpController[]): Middleware 
       if (method && route.path === requestPath) {
         const data = await getRequestData(request);
 
-        route.assert?.apply(route, [data, request]);
+        if (route.guards) {
+          return findMap(route.guards, (guard) => guard(data, request)) ?? method(data, request);
+        }
 
-        return method.apply(route, [data, request]);
+        return method(data, request);
       }
     }
 

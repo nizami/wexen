@@ -6,9 +6,9 @@ import {
   logger,
   LogLevel,
   logRequest,
-  Middleware,
   newHttpRequest,
   newNotFoundResponse,
+  ServerMiddleware,
   TerminalColor,
   WebServerConfig,
 } from '#wexen';
@@ -23,7 +23,7 @@ export function runWebServer(config: WebServerConfig): {httpServer: http.Server;
     // ...getCertificate(),
   };
 
-  const middlewares: Middleware[] = [];
+  const middlewares: ServerMiddleware[] = [];
 
   if (config.controllers) {
     middlewares.push(controllerMiddleware(config.controllers));
@@ -50,7 +50,7 @@ export function runWebServer(config: WebServerConfig): {httpServer: http.Server;
   };
 }
 
-function serverListener(middlewares: Middleware[]) {
+function serverListener(middlewares: ServerMiddleware[]) {
   return async (req: IncomingMessage, res: ServerResponse) => {
     try {
       if (!req.url) {
@@ -82,7 +82,10 @@ function serverListener(middlewares: Middleware[]) {
   };
 }
 
-async function middlewareResponse(middlewares: Middleware[], request: HttpRequest): Promise<HttpResponse> {
+async function middlewareResponse(
+  middlewares: ServerMiddleware[],
+  request: HttpRequest,
+): Promise<HttpResponse> {
   for (const middleware of middlewares) {
     const response = await middleware(request);
 

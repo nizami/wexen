@@ -3,15 +3,15 @@ import {
   HttpRequest,
   HttpResponse,
   HttpStatusCode,
-  Middleware,
   newFileResponse,
   newJsonResponse,
   None,
+  ServerMiddleware,
 } from '#wexen';
 import {existsSync, statSync} from 'node:fs';
 import {resolve} from 'node:path';
 
-export function staticFilesMiddleware(staticFileDirectories: string[]): Middleware {
+export function staticFilesMiddleware(staticFileDirectories: string[]): ServerMiddleware {
   return async (request: HttpRequest): Promise<HttpResponse | None> => {
     if (request.method !== HttpMethod.Get) {
       const notAllowedResponse = newJsonResponse(

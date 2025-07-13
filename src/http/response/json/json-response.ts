@@ -1,17 +1,13 @@
-import {$WebType, HttpResponse, HttpStatusCode, newHttpHeaders} from '#wexen';
+import {HttpResponse, HttpStatusCode, newHttpHeaders} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
-import {Brand} from 'rtt';
 
-export type JsonResponse = HttpResponse & Brand<'Web.JsonResponse'> & {};
-
-export const $JsonResponse = () => $WebType<JsonResponse>('JsonResponse');
+export type JsonResponse = HttpResponse & {};
 
 export function newJsonResponse(
   value: unknown,
   statusCode: HttpStatusCode = HttpStatusCode.Ok,
 ): JsonResponse {
   return {
-    $type: $JsonResponse(),
     statusCode,
     headers: newHttpHeaders({'content-type': 'application/json'}),
     body: JSON.stringify(value),

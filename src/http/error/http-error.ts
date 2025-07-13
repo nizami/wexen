@@ -1,10 +1,12 @@
-import {$WebType, HttpStatusCode} from '#wexen';
-import {Brand, Model} from 'rtt';
+import {HttpMethod, HttpStatusCode} from '#wexen';
 
-export type HttpError = Model &
-  Brand<'Web.HttpError'> & {
-    statusCode: HttpStatusCode;
-    message: string;
-  };
-
-export const $HttpError = () => $WebType<HttpError>('HttpError');
+export class HttpError extends Error {
+  constructor(
+    public statusCode: HttpStatusCode,
+    public method: HttpMethod,
+    public url: string,
+    message: string,
+  ) {
+    super(`${statusCode} ${method} ${url} ${message}`);
+  }
+}

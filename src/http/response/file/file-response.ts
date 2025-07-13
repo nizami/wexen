@@ -1,21 +1,16 @@
-import {$WebType, contentTypeFromExtension, HttpResponse, newHttpHeaders} from '#wexen';
+import {contentTypeFromExtension, HttpResponse, newHttpHeaders} from '#wexen';
 import {readFileSync} from 'node:fs';
 import {IncomingMessage, ServerResponse} from 'node:http';
-import {Brand} from 'rtt';
 import {gzip} from 'zlib';
 
-export type FileResponse = HttpResponse &
-  Brand<'Web.FileResponse'> & {
-    readonly filePath: string;
-  };
-
-export const $FileResponse = () => $WebType<FileResponse>('FileResponse');
+export type FileResponse = HttpResponse & {
+  readonly filePath: string;
+};
 
 export function newFileResponse(filePath: string, statusCode: number = 200): FileResponse {
   const pathExtension = filePath.split('.').pop()?.toLowerCase() || '';
 
   return {
-    $type: $FileResponse(),
     statusCode,
     headers: newHttpHeaders({'content-type': contentTypeFromExtension(pathExtension)}),
     body: readFileSync(filePath),

@@ -1,4 +1,4 @@
-import {$HttpRequest, HttpMethod, HttpRequest, newHttpHeaders, None} from '#wexen';
+import {HttpMethod, HttpRequest, newHttpHeaders, None} from '#wexen';
 import {IncomingMessage} from 'node:http';
 import {parse} from 'node:url';
 
@@ -6,14 +6,13 @@ export function newHttpRequest(request: IncomingMessage): HttpRequest {
   let _data: string | None = null;
 
   return {
-    $type: $HttpRequest(),
     remoteAddress: request.socket.remoteAddress,
     // todo checked before used
     method: request.method as HttpMethod,
     url: parse(request.url ?? '', true),
     headers: newHttpHeaders(request.headers),
 
-    async data(): Promise<string> {
+    async text(): Promise<string> {
       if (_data) {
         return _data;
       }
@@ -32,7 +31,7 @@ export function newHttpRequest(request: IncomingMessage): HttpRequest {
     },
 
     async json(): Promise<unknown> {
-      return JSON.parse(await this.data());
+      return JSON.parse(await this.text());
     },
   };
 }

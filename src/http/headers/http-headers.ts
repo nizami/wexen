@@ -1,15 +1,11 @@
-import {$WebType, None} from '#wexen';
-import {Brand, Model} from 'rtt';
+import {None} from '#wexen';
 
-export type HttpHeaders = Model &
-  Brand<'Web.HttpHeaders'> & {
-    items: HttpHeaderList & Record<string, string | string[] | undefined>;
+export type HttpHeaders = {
+  items: HttpHeaderList & Record<string, string | string[] | undefined>;
 
-    get(key: string): string | string[] | None;
-    set(key: string, value: string | string[] | None): void;
-  };
-
-export const $HttpHeaders = () => $WebType<HttpHeaders>('HttpHeaders');
+  get(key: string): string | string[] | None;
+  set(key: string, value: string | string[] | None): void;
+};
 
 export type HttpHeaderList = {
   Accept?: string | string[] | undefined;

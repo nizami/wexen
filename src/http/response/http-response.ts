@@ -1,14 +1,10 @@
-import {$WebType, HttpHeaders, HttpStatusCode} from '#wexen';
+import {HttpHeaders, HttpStatusCode} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
-import {Brand, Model} from 'rtt';
 
-export type HttpResponse = Model &
-  Brand<'Web.HttpResponse'> & {
-    statusCode: HttpStatusCode;
-    headers: HttpHeaders;
-    body: string | Buffer;
+export type HttpResponse = {
+  statusCode: HttpStatusCode;
+  headers: HttpHeaders;
+  body: string | Buffer;
 
-    send(request: IncomingMessage, response: ServerResponse): Promise<void>;
-  };
-
-export const $HttpResponse = () => $WebType<HttpResponse>('HttpResponse');
+  send(request: IncomingMessage, response: ServerResponse): Promise<void>;
+};
