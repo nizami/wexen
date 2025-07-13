@@ -12,6 +12,10 @@ export function newHttpRequest(request: IncomingMessage): HttpRequest {
     url: parse(request.url ?? '', true),
     headers: newHttpHeaders(request.headers),
 
+    query(): Record<string, string | string[] | undefined> {
+      return this.url.query;
+    },
+
     async text(): Promise<string> {
       if (_data) {
         return _data;

@@ -1,6 +1,7 @@
-import {ControllerRoute} from '#wexen';
+import {Middleware, None} from '#wexen';
 
 export type Controller = {
-  path: string;
-  routes: ControllerRoute[];
+  path?: string | None;
+  middlewares?: Middleware[] | None;
+  children?: Controller[] | None;
 };

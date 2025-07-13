@@ -1,8 +1,8 @@
-import {Controller, None, ServerMiddleware} from '#wexen';
+import {Controller, Middleware, None} from '#wexen';
 
 export type WebServerConfig = {
   httpPort: number;
   httpsPort: number;
   controllers?: Controller[] | None;
-  staticFilesMiddleware?: ServerMiddleware | None;
+  staticFilesMiddleware?: Middleware | None;
 };

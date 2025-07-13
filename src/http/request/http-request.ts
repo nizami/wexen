@@ -11,6 +11,7 @@ export type HttpRequest = {
   // pathParams: Record<string, string>;
   // payload: Record<string, string>;
 
+  query(): Record<string, string | string[] | undefined>;
   text(): Promise<string>;
   json(): Promise<unknown>;
 };
