@@ -70,7 +70,7 @@ function serverListener(middlewares: Middleware[]) {
 
       await response.send(req, res);
 
-      const humanizedTime = humanizeTime( process.hrtime.bigint() - performanceTime);
+      const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
 
       if (isSuccessfulStatusCode(response.statusCode)) {
         logRequest(LogLevel.Info, request, response, humanizedTime, TerminalColor.FG_GREEN);
@@ -85,7 +85,7 @@ function serverListener(middlewares: Middleware[]) {
       // todo don't use stringify
       res.end(JSON.stringify({error: error.message}));
 
-      const humanizedTime = humanizeTime( process.hrtime.bigint() - performanceTime);
+      const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
 
       logger.error(
         `${error.statusCode} ${req.method} ${req.url} ${humanizedTime} ip: ${

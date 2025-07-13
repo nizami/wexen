@@ -1,16 +1,13 @@
-export function humanizeTime(ms: bigint): string {
-  let totalSeconds = Math.floor(ms / 1000);
-  let totalMinutes = Math.floor(totalSeconds / 60);
+export function humanizeTime(ns: bigint): string {
+  const totalMilliseconds = ns / 1_000_000n;
+  const totalSeconds = totalMilliseconds / 1000n;
+  const totalMinutes = totalSeconds / 60n;
 
-  let milliseconds = Math.floor(ms % 1000);
-  let seconds = totalSeconds % 60;
-  let minutes = totalMinutes % 60;
-  let hours = Math.floor(totalMinutes / 60);
-
-  let hh = String(hours).padStart(2, '0');
-  let mm = String(minutes).padStart(2, '0');
-  let ss = String(seconds).padStart(2, '0');
-  let mss = String(milliseconds).padStart(3, '0');
+  const nanoseconds = ns % 1_000_000n;
+  const milliseconds = totalMilliseconds % 1000n;
+  const seconds = totalSeconds % 60n;
+  const minutes = totalMinutes % 60n;
+  const hours = totalMinutes / 60n;
 
   const result = [];
 
@@ -28,7 +25,9 @@ export function humanizeTime(ms: bigint): string {
 
   if (milliseconds > 0) {
     result.push(`${milliseconds}ms`);
+  } else if (nanoseconds > 0) {
+    result.push(`0.${ns / 1_000n}ms`);
   }
 
-  return result.join(' ');
+  return result.join('');
 }
