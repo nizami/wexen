@@ -3,8 +3,8 @@ import {None} from '#wexen';
 export type HttpHeaders = {
   items: HttpHeaderList & Record<string, string | string[] | undefined>;
 
-  get(key: string): string | string[] | None;
-  set(key: string, value: string | string[] | None): void;
+  get(key: keyof HttpHeaderList | (string & {})): string | string[] | None;
+  set(key: keyof HttpHeaderList | (string & {}), value: string | string[] | None): void;
 };
 
 export type HttpHeaderList = {
