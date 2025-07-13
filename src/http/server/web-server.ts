@@ -73,17 +73,19 @@ function serverListener(middlewares: Middleware[]) {
         logRequest(LogLevel.Error, request, response);
       }
     } catch (error: any) {
-      if (error instanceof HttpError) {
-        res.writeHead(error.statusCode, {'Content-Type': 'application/json'});
-        // todo don't use stringify
-        res.end(JSON.stringify({error: error.message}));
-      } else {
-        res.writeHead(HttpStatusCode.InternalServerError, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({error: 'Internal Error'}));
-      }
+      const e =
+        error instanceof HttpError
+          ? error
+          : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
+
+      res.writeHead(e.statusCode, {'Content-Type': 'application/json'});
+      // todo don't use stringify
+      res.end(JSON.stringify({error: e.message}));
 
       logger.error(
-        `${500} ${req.method} ${req.url} ip: ${req.socket.remoteAddress} ${String(error['stack'] ?? error)}`,
+        `${e.statusCode} ${req.method} ${req.url} ip: ${req.socket.remoteAddress} ${String(
+          error['stack'] ?? error,
+        )}`,
       );
     }
   };
