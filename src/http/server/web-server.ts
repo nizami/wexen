@@ -72,19 +72,19 @@ function serverListener(middlewares: Middleware[]) {
       } else {
         logRequest(LogLevel.Error, request, response);
       }
-    } catch (error: any) {
-      const e =
-        error instanceof HttpError
-          ? error
+    } catch (err: any) {
+      const error =
+        err instanceof HttpError
+          ? err
           : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
 
-      res.writeHead(e.statusCode, {'Content-Type': 'application/json'});
+      res.writeHead(error.statusCode, {'Content-Type': 'application/json'});
       // todo don't use stringify
-      res.end(JSON.stringify({error: e.message}));
+      res.end(JSON.stringify({error: error.message}));
 
       logger.error(
-        `${e.statusCode} ${req.method} ${req.url} ip: ${req.socket.remoteAddress} ${String(
-          error['stack'] ?? error,
+        `${error.statusCode} ${req.method} ${req.url} ip: ${req.socket.remoteAddress} ${String(
+          err['stack'] ?? err,
         )}`,
       );
     }
