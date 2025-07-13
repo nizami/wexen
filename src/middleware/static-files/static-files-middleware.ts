@@ -15,7 +15,7 @@ export function staticFilesMiddleware(staticFileDirectories: string[]): Middlewa
   return async (request: HttpRequest): Promise<HttpResponse | None> => {
     if (request.method !== HttpMethod.Get) {
       const notAllowedResponse = newJsonResponse(
-        {message: 'Method Not Allowed'},
+        {error: 'Method Not Allowed'},
         HttpStatusCode.MethodNotAllowed,
       );
 

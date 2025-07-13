@@ -1,5 +1,6 @@
 import {
   controllerMiddleware,
+  HttpError,
   HttpRequest,
   HttpResponse,
   HttpStatusCode,
@@ -72,8 +73,14 @@ function serverListener(middlewares: Middleware[]) {
         logRequest(LogLevel.Error, request, response);
       }
     } catch (error: any) {
-      res.writeHead(400, {'Content-Type': 'application/json'});
-      res.end(JSON.stringify({message: 'Internal Error'}));
+      if (error instanceof HttpError) {
+        res.writeHead(error.statusCode, {'Content-Type': 'application/json'});
+        // todo don't use stringify
+        res.end(JSON.stringify({error: error.message}));
+      } else {
+        res.writeHead(HttpStatusCode.InternalServerError, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({error: 'Internal Error'}));
+      }
 
       logger.error(
         `${500} ${req.method} ${req.url} ip: ${req.socket.remoteAddress} ${String(error['stack'] ?? error)}`,

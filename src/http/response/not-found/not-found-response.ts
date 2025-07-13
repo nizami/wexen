@@ -1,7 +1,7 @@
 import {HttpResponse, HttpStatusCode, newHttpHeaders, None} from '#wexen';
 import {IncomingMessage, ServerResponse} from 'node:http';
 
-const notFoundMessage = JSON.stringify({message: 'Not Found'});
+const notFoundMessage = JSON.stringify({error: 'Not Found'});
 
 export type NotFoundResponse = HttpResponse & {};
 
