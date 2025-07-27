@@ -1,5 +1,6 @@
 import {
   HttpError,
+  HttpMethod,
   HttpRequest,
   HttpResponse,
   HttpStatusCode,
@@ -13,38 +14,20 @@ import {
   TerminalColor,
   WebServerConfig,
 } from '#wexen';
-import {existsSync, readFileSync} from 'node:fs';
-import http, {IncomingMessage, ServerResponse} from 'node:http';
-import https from 'node:https';
+import {createSecureServer, Http2Server, Http2ServerRequest, Http2ServerResponse} from 'node:http2';
 import {networkInterfaces} from 'node:os';
-import {resolve} from 'node:path';
 
-export function runWebServer(config: WebServerConfig): {httpServer: http.Server; httpsServer: https.Server} {
-  const httpsOptions: https.ServerOptions = {
-    // ...getCertificate(),
-  };
-
-  const middlewares = config.middlewares ?? [];
-
+export function runWebServer(config: WebServerConfig): Http2Server {
   logger.info(`Web server is running:`, TerminalColor.FG_GREEN);
   logger.info(`-`.repeat(24), TerminalColor.FG_GREEN);
 
-  const httpServer = http
-    .createServer(serverListener(middlewares))
-    .listen(config.httpPort, () => logListening('http', config.httpPort));
-
-  const httpsServer = https
-    .createServer(httpsOptions, serverListener(middlewares))
-    .listen(config.httpsPort, () => logListening('https', config.httpsPort));
-
-  return {
-    httpServer,
-    httpsServer,
-  };
+  return createSecureServer(config, serverListener(config)).listen(config.port, () => logListening(config));
 }
 
-function serverListener(middlewares: Middleware[]) {
-  return async (req: IncomingMessage, res: ServerResponse) => {
+function serverListener(config: WebServerConfig) {
+  const middlewares = config.middlewares ?? [];
+
+  return async (req: Http2ServerRequest, res: Http2ServerResponse) => {
     const performanceTime = process.hrtime.bigint();
 
     try {
@@ -59,9 +42,20 @@ function serverListener(middlewares: Middleware[]) {
       const request = newHttpRequest(req);
       const response = await middlewareResponse(middlewares, request);
 
-      response.headers.set('Access-Control-Allow-Origin', '*');
-      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      // const origin = req.headers.origin;
+
+      // if (origin && config.origins?.includes(origin)) {
+      //   res.setHeader('Access-Control-Allow-Origin', origin);
+      // }
+
+      // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+      // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      // res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+      // if (req.method === HttpMethod.Options) {
+      //   res.writeHead(HttpStatusCode.NoContent);
+      //   return res.end();
+      // }
 
       await response.send(req, res);
 
@@ -95,8 +89,8 @@ async function middlewareResponse(middlewares: Middleware[], request: HttpReques
   return newNotFoundResponse();
 }
 
-function logListening(protocol: string, port: number): void {
-  logger.info(`${protocol}://localhost:${port}`, TerminalColor.FG_GREEN);
+function logListening(config: WebServerConfig): void {
+  logger.info(`https://localhost:${config.port}`, TerminalColor.FG_GREEN);
 
   const interfaces = networkInterfaces();
 
@@ -104,24 +98,9 @@ function logListening(protocol: string, port: number): void {
     .map((x) => interfaces[x] ?? [])
     .flat()
     .filter((x) => x.family === 'IPv4' && !x.internal)
-    .forEach((x) => logger.info(`${protocol}://${x.address}:${port}`, TerminalColor.FG_GREEN));
+    .forEach((x) => logger.info(`https://${x.address}:${config.port}`, TerminalColor.FG_GREEN));
 
   logger.info(`-`.repeat(24), TerminalColor.FG_GREEN);
-}
-
-function getCertificate(): {cert: Buffer; key: Buffer} | undefined {
-  // ../cert/cert.pem
-  const certFilePath = resolve(import.meta.dirname, 'cert.pem');
-  const keyFilePath = resolve(import.meta.dirname, 'key.pem');
-
-  if (existsSync(certFilePath) && existsSync(keyFilePath)) {
-    return {
-      cert: readFileSync(certFilePath),
-      key: readFileSync(keyFilePath),
-    };
-  }
-
-  logger.error(`Certificate not found`);
 }
 
 function isSuccessfulStatusCode(statusCode: HttpStatusCode): boolean {

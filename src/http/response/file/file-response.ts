@@ -1,6 +1,6 @@
 import {contentTypeFromExtension, HttpResponse, newHttpHeaders} from '#wexen';
 import {readFileSync} from 'node:fs';
-import {IncomingMessage, ServerResponse} from 'node:http';
+import {Http2ServerRequest, Http2ServerResponse} from 'node:http2';
 import {gzip} from 'zlib';
 
 export type FileResponse = HttpResponse & {
@@ -16,7 +16,7 @@ export function newFileResponse(filePath: string, statusCode: number = 200): Fil
     body: readFileSync(filePath),
     filePath,
 
-    async send(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    async send(request: Http2ServerRequest, response: Http2ServerResponse): Promise<void> {
       const acceptEncoding = request.headers['accept-encoding'];
       const supportsGzip = acceptEncoding?.includes('gzip');
 

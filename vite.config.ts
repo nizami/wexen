@@ -28,6 +28,7 @@ export default defineConfig({
         'node:fs',
         'node:http',
         'node:https',
+        'node:http2',
         'node:os',
         'node:path',
         'node:url',

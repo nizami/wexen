@@ -1,7 +1,7 @@
-import {Middleware, None} from '#wexen';
+import {Middleware} from '#wexen';
+import {SecureServerOptions} from 'node:http2';
 
-export type WebServerConfig = {
-  httpPort: number;
-  httpsPort: number;
-  middlewares?: Middleware[] | None;
+export type WebServerConfig = SecureServerOptions & {
+  port: number;
+  middlewares?: Middleware[];
 };

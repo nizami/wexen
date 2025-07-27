@@ -1,8 +1,8 @@
 import {HttpMethod, HttpRequest, newHttpHeaders, None} from '#wexen';
-import {IncomingMessage} from 'node:http';
+import {Http2ServerRequest} from 'node:http2';
 import {parse} from 'node:url';
 
-export function newHttpRequest(request: IncomingMessage): HttpRequest {
+export function newHttpRequest(request: Http2ServerRequest): HttpRequest {
   let _data: string | None = null;
 
   return {

@@ -1,5 +1,5 @@
 import {HttpResponse, newHttpHeaders} from '#wexen';
-import {IncomingMessage, ServerResponse} from 'node:http';
+import {Http2ServerRequest, Http2ServerResponse} from 'node:http2';
 import {gzip} from 'zlib';
 
 export type HtmlResponse = HttpResponse & {};
@@ -10,7 +10,7 @@ export function newHtmlResponse(html: string | Buffer, statusCode: number = 200)
     headers: newHttpHeaders({'content-type': 'text/html'}),
     body: html,
 
-    async send(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    async send(request: Http2ServerRequest, response: Http2ServerResponse): Promise<void> {
       const acceptEncoding = request.headers['accept-encoding'];
       const supportsGzip = acceptEncoding?.includes('gzip');
 

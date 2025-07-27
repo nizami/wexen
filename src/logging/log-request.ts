@@ -1,9 +1,9 @@
 import {HttpStatusCode, logger, LogLevel, None, TerminalColor} from '#wexen';
-import {IncomingMessage} from 'node:http';
+import {Http2ServerRequest} from 'node:http2';
 
 export function logRequest(
   level: LogLevel,
-  request: IncomingMessage,
+  request: Http2ServerRequest,
   statusCode: HttpStatusCode,
   message?: string | None,
   color?: TerminalColor | None,
