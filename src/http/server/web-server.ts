@@ -1,5 +1,4 @@
 import {
-  controllerMiddleware,
   HttpError,
   HttpRequest,
   HttpResponse,
@@ -25,15 +24,7 @@ export function runWebServer(config: WebServerConfig): {httpServer: http.Server;
     // ...getCertificate(),
   };
 
-  const middlewares: Middleware[] = [];
-
-  if (config.controllers) {
-    middlewares.push(controllerMiddleware(config.controllers));
-  }
-
-  if (config.staticFilesMiddleware) {
-    middlewares.push(config.staticFilesMiddleware);
-  }
+  const middlewares = config.middlewares ?? [];
 
   logger.info(`Web server is running:`, TerminalColor.FG_GREEN);
   logger.info(`-`.repeat(24), TerminalColor.FG_GREEN);
@@ -67,6 +58,10 @@ function serverListener(middlewares: Middleware[]) {
 
       const request = newHttpRequest(req);
       const response = await middlewareResponse(middlewares, request);
+
+      response.headers.set('Access-Control-Allow-Origin', '*');
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
       await response.send(req, res);
 
