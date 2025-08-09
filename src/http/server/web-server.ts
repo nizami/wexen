@@ -1,6 +1,5 @@
 import {
   HttpError,
-  HttpMethod,
   HttpRequest,
   HttpResponse,
   HttpStatusCode,
@@ -41,21 +40,6 @@ function serverListener(config: WebServerConfig) {
 
       const request = newHttpRequest(req);
       const response = await middlewareResponse(middlewares, request);
-
-      const origin = req.headers.origin;
-
-      if (origin && config.origins?.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-      }
-
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-      if (req.method === HttpMethod.Options) {
-        res.writeHead(HttpStatusCode.NoContent);
-        return res.end();
-      }
 
       await response.send(req, res);
 
