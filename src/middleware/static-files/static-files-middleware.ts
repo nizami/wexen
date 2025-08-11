@@ -19,12 +19,12 @@ export function staticFilesMiddleware(staticFileDirectories: string[]): Middlewa
         HttpStatusCode.MethodNotAllowed,
       );
 
-      notAllowedResponse.headers.set('Allow', 'GET');
+      notAllowedResponse.headers['allow'] = 'GET';
 
       return notAllowedResponse;
     }
 
-    const requestPath = request.url?.path?.slice(1) || 'index.html';
+    const requestPath = request.url.pathname.slice(1) || 'index.html';
 
     for (const directory of staticFileDirectories) {
       const path = resolve(directory, requestPath);

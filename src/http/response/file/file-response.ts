@@ -1,41 +1,46 @@
-import {contentTypeFromExtension, HttpResponse, newHttpHeaders} from '#wexen';
+import {contentTypeFromExtension, HttpResponse, HttpStatusCode} from '#wexen';
 import {readFileSync} from 'node:fs';
-import {Http2ServerRequest, Http2ServerResponse} from 'node:http2';
 import {gzip} from 'zlib';
 
 export type FileResponse = HttpResponse & {
   readonly filePath: string;
 };
 
-export function newFileResponse(filePath: string, statusCode: number = 200): FileResponse {
-  const pathExtension = filePath.split('.').pop()?.toLowerCase() || '';
-
+//  use BufferResponse for fileResponse and htmlResponse
+export function newFileResponse(filePath: string, statusCode = HttpStatusCode.Ok): FileResponse {
   return {
-    statusCode,
-    headers: newHttpHeaders({'content-type': contentTypeFromExtension(pathExtension)}),
-    body: readFileSync(filePath),
     filePath,
+    headers: {
+      ':status': statusCode,
+      'content-type': 'text/html',
+    },
 
-    async send(request: Http2ServerRequest, response: Http2ServerResponse): Promise<void> {
+    async send(stream, request) {
       const acceptEncoding = request.headers['accept-encoding'];
       const supportsGzip = acceptEncoding?.includes('gzip');
+      const fileContent = readFileSync(filePath);
 
       if (supportsGzip) {
-        gzip(this.body, (err, compressedData) => {
+        gzip(fileContent, (err, compressedData) => {
           if (err) {
-            response.writeHead(500);
-            response.end('Compression Error');
+            this.headers[':status'] = HttpStatusCode.InternalServerError;
+            this.headers['content-type'] = 'text/plain';
+            stream.respond(this.headers);
+            stream.end('Compression Error');
 
             return;
           }
 
-          response.setHeader('Content-Encoding', 'gzip');
-          response.writeHead(response.statusCode, this.headers.items);
-          response.end(compressedData);
+          this.headers['content-encoding'] = 'gzip';
+          stream.respond(this.headers);
+          stream.end(compressedData);
         });
       } else {
-        response.writeHead(response.statusCode, this.headers.items);
-        response.end(this.body);
+        const pathExtension = this.filePath.split('.').pop()?.toLowerCase() || '';
+        const contentType = contentTypeFromExtension(pathExtension);
+        this.headers['content-type'] = contentType;
+        stream.respond(this.headers);
+        stream.end(fileContent);
       }
     },
   };

@@ -9,54 +9,49 @@ import {
   logRequest,
   Middleware,
   newHttpRequest,
+  newJsonResponse,
   newNotFoundResponse,
   TerminalColor,
   WebServerConfig,
 } from '#wexen';
-import {createSecureServer, Http2Server, Http2ServerRequest, Http2ServerResponse} from 'node:http2';
+import {createSecureServer, Http2Server, IncomingHttpHeaders, ServerHttp2Stream} from 'node:http2';
 import {networkInterfaces} from 'node:os';
 
 export function runWebServer(config: WebServerConfig): Http2Server {
   logger.info(`Web server is running:`, TerminalColor.FG_GREEN);
-  logger.info(`-`.repeat(24), TerminalColor.FG_GREEN);
+  logger.info(`-`.repeat(24));
 
-  return createSecureServer(config, serverListener(config)).listen(config.port, () => logListening(config));
+  const server = createSecureServer(config);
+
+  return server.on('stream', onServerStream(config)).listen(config.port, () => logListening(config));
 }
 
-function serverListener(config: WebServerConfig) {
-  const middlewares = config.middlewares ?? [];
+function onServerStream(config: WebServerConfig) {
+  const middlewares = [...(config.middlewares ?? [])];
 
-  return async (req: Http2ServerRequest, res: Http2ServerResponse) => {
+  return async (stream: ServerHttp2Stream, headers: IncomingHttpHeaders) => {
     const performanceTime = process.hrtime.bigint();
+    const request = newHttpRequest(stream, headers);
 
     try {
-      if (!req.url) {
-        throw new Error('URL Not Found');
-      }
-
-      if (!req.method) {
-        throw new Error('HTTP Method Not Found');
-      }
-
-      const request = newHttpRequest(req);
       const response = await middlewareResponse(middlewares, request);
-
-      await response.send(req, res);
+      await response.send(stream, request);
 
       const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
-      const logLevel = isSuccessfulStatusCode(response.statusCode) ? LogLevel.Info : LogLevel.Error;
 
-      logRequest(logLevel, req, response.statusCode, humanizedTime);
+      const statusCode = response.headers[':status'];
+      const logLevel = isSuccessfulStatusCode(statusCode) ? LogLevel.Info : LogLevel.Error;
+      logRequest(logLevel, request, statusCode, humanizedTime);
     } catch (err: any) {
       const error =
         err instanceof HttpError ? err : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
 
-      res.writeHead(error.statusCode, {'Content-Type': 'application/json'});
-      // todo don't use stringify
-      res.end(JSON.stringify({error: error.message}));
+      const response = newJsonResponse({error: error.message}, error.statusCode);
+      await response.send(stream, request);
 
+      const statusCode = response.headers[':status'];
       const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
-      logRequest(LogLevel.Error, req, error.statusCode, `${humanizedTime}\n${String(err['stack'] ?? err)}`);
+      logRequest(LogLevel.Error, request, statusCode, `${humanizedTime}\n${String(err['stack'] ?? err)}`);
     }
   };
 }

@@ -1,36 +1,35 @@
-import {HttpResponse, newHttpHeaders} from '#wexen';
-import {Http2ServerRequest, Http2ServerResponse} from 'node:http2';
+import {HttpResponse, HttpStatusCode} from '#wexen';
 import {gzip} from 'zlib';
 
-export type HtmlResponse = HttpResponse & {};
-
-export function newHtmlResponse(html: string | Buffer, statusCode: number = 200): HtmlResponse {
+export function newHtmlResponse(html: string | Buffer, statusCode = HttpStatusCode.Ok): HttpResponse {
   return {
-    statusCode,
-    headers: newHttpHeaders({'content-type': 'text/html'}),
-    body: html,
+    headers: {
+      ':status': statusCode,
+      'content-type': 'text/html',
+    },
 
-    async send(request: Http2ServerRequest, response: Http2ServerResponse): Promise<void> {
+    async send(stream, request) {
       const acceptEncoding = request.headers['accept-encoding'];
       const supportsGzip = acceptEncoding?.includes('gzip');
 
       if (supportsGzip) {
-        gzip(this.body, (err, compressedData) => {
+        gzip(html, (err, compressedData) => {
           if (err) {
-            response.writeHead(500);
-            response.end('Compression Error');
+            this.headers[':status'] = HttpStatusCode.InternalServerError;
+            this.headers['content-type'] = 'text/plain';
+            stream.respond(this.headers);
+            stream.end('Compression Error');
 
             return;
           }
 
-          response.setHeader('Content-Encoding', 'gzip');
-          response.setHeader('Content-Type', 'text/html');
-          response.writeHead(response.statusCode, this.headers.items);
-          response.end(compressedData);
+          this.headers['content-encoding'] = 'gzip';
+          stream.respond(this.headers);
+          stream.end(compressedData);
         });
       } else {
-        response.writeHead(response.statusCode, this.headers.items);
-        response.end(this.body);
+        stream.respond(this.headers);
+        stream.end(html);
       }
     },
   };

@@ -1,17 +1,13 @@
-import {HttpHeaders, HttpMethod, None} from '#wexen';
-import {UrlWithParsedQuery} from 'url';
+import {HttpMethod, None} from '#wexen';
+import {Http2Session, IncomingHttpHeaders} from 'node:http2';
 
 export type HttpRequest = {
-  method: HttpMethod;
-  remoteAddress?: string | None;
-  headers: HttpHeaders;
-  // todo replace 'UrlWithParsedQuery'
-  url: UrlWithParsedQuery;
-  // queryParams: Record<string, string>;
-  // pathParams: Record<string, string>;
-  // payload: Record<string, string>;
+  session?: Http2Session | None;
+  method?: HttpMethod | None;
+  headers: IncomingHttpHeaders;
+  url: URL;
 
-  query(): Record<string, string | string[] | undefined>;
+  data(): Promise<Buffer>;
   text(): Promise<string>;
   json(): Promise<unknown>;
 };

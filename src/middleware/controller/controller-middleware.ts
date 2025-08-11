@@ -5,7 +5,11 @@ export function controllerMiddleware(controllers: Controller[]): Middleware {
 
   return async (request: HttpRequest): Promise<HttpResponse | None> => {
     const requestPath = request.url.pathname?.toLowerCase() ?? '';
-    const middlewares = controllerDictionary[requestPath];
+    const middlewares: Middleware[] | None = controllerDictionary[requestPath];
+
+    if (!middlewares) {
+      return null;
+    }
 
     for (const middleware of middlewares) {
       const result = await middleware(request);

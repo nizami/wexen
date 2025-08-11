@@ -1,27 +1,12 @@
 {
-  "name": "wexen",
-  "version": "1.3.0",
-  "description": "Mini web",
-  "main": "index.js",
-  "scripts": {
-    "build": "barrelize && vite build",
-    "test": "vitest run"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/nizami/wexen.git"
-  },
-  "keywords": [
-    "Web",
-    "Http",
-    "Server"
-  ],
   "author": "Nizami",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/nizami/wexen/issues"
   },
-  "homepage": "https://github.com/nizami/wexen#readme",
+  "dependencies": {
+    "ws": "^8.18.3"
+  },
+  "description": "Mini web",
   "devDependencies": {
     "@types/node": "^24.2.1",
     "@types/ws": "^8.18.1",
@@ -31,19 +16,34 @@
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
   },
-  "dependencies": {
-    "ws": "^8.18.3"
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "type": "module",
-  "sideEffects": false,
   "files": [
     "dist"
   ],
+  "homepage": "https://github.com/nizami/wexen#readme",
+  "keywords": [
+    "Web",
+    "Http",
+    "Server"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "wexen",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nizami/wexen.git"
+  },
+  "scripts": {
+    "build": "barrelize && vite build",
+    "test": "vitest run"
+  },
+  "sideEffects": false,
+  "type": "module",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  }
+  "version": "1.3.0"
 }
