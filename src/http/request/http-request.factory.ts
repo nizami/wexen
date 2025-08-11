@@ -1,7 +1,7 @@
-import {HttpMethod, HttpRequest, None} from '#wexen';
+import {contentTypeByFilePath, FileRequestInfo, HttpMethod, HttpRequest, None} from '#wexen';
+import {WriteStream} from 'node:fs';
 import {IncomingHttpHeaders, ServerHttp2Stream} from 'node:http2';
-
-const DEFAULT_MAX_REQUEST_DATA_SIZE_BYTES = 10 * 1024 * 1024;
+import Stream from 'node:stream';
 
 export function newHttpRequest(stream: ServerHttp2Stream, headers: IncomingHttpHeaders): HttpRequest {
   let _url: URL | None = null;
@@ -38,66 +38,21 @@ export function newHttpRequest(stream: ServerHttp2Stream, headers: IncomingHttpH
       return _text;
     },
 
-    // async files(maxFileSizeBytes = DEFAULT_MAX_REQUEST_DATA_SIZE_BYTES): Promise<string> {
-    //   const contentType = this.headers['content-type'];
+    async file(cb: (fileName: string) => WriteStream): Promise<FileRequestInfo> {
+      const fileName = headers['x-filename']?.toString() ?? crypto.randomUUID();
 
-    //   if (!contentType) {
-    //     return '';
-    //   }
+      const outputStream = cb(fileName);
+      stream.pipe(outputStream);
+      await streamFinish(outputStream);
 
-    //   const boundaryMatch = contentType.match(/boundary=(.+)$/);
+      const contentType = this.headers['content-type'];
 
-    //   if (!boundaryMatch) {
-    //     return '';
-    //   }
-
-    //   const boundary = `--${boundaryMatch[1]}`;
-
-    //   let buffer = Buffer.alloc(0);
-    //   let currentFile: WriteStream | null = null;
-
-    //   stream.on('data', (chunk: Buffer) => {
-    //     buffer = Buffer.concat([buffer, chunk]);
-
-    //     let boundaryIndex: number;
-    //     while ((boundaryIndex = buffer.indexOf(boundary)) >= 0) {
-    //       const part = buffer.subarray(0, boundaryIndex);
-    //       buffer = buffer.subarray(boundaryIndex + boundary.length);
-
-    //       if (currentFile) {
-    //         // Remove trailing CRLF before boundary
-    //         const trimmed = part.subarray(0, part.length - 2);
-    //         if (trimmed.length > 0) currentFile.write(trimmed);
-    //         currentFile.end();
-    //         currentFile = null;
-    //       } else {
-    //         const headerEnd = part.indexOf('\r\n\r\n');
-    //         if (headerEnd > -1) {
-    //           const headersPart = part.subarray(0, headerEnd).toString();
-    //           const fileMatch = headersPart.match(/filename="(.+?)"/);
-
-    //           if (fileMatch) {
-    //             const filename = fileMatch[1];
-    //             const filePath = path.join(UPLOAD_DIR, filename);
-    //             currentFile = fs.createWriteStream(filePath);
-    //             const fileData = part.subarray(headerEnd + 4);
-    //             if (fileData.length > 0) currentFile.write(fileData);
-    //           }
-    //         }
-    //       }
-
-    //       // Remove leading CRLF after boundary
-    //       if (buffer.subarray(0, 2).toString() === '\r\n') {
-    //         buffer = buffer.subarray(2);
-    //       }
-    //     }
-    //   });
-
-    //   request.on('end', () => {
-    //     res.writeHead(200, {'content-type': 'text/plain'});
-    //     res.end('Upload complete');
-    //   });
-    // },
+      return {
+        name: fileName,
+        type: contentType ?? contentTypeByFilePath(fileName),
+        size: outputStream.bytesWritten,
+      };
+    },
   };
 }
 
@@ -110,17 +65,19 @@ function urlFromHeaders(headers: IncomingHttpHeaders): URL {
   return new URL(urlString);
 }
 
-function streamToData(stream: ServerHttp2Stream): Promise<Buffer> {
+function streamToData(stream: Stream): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    let buffer = Buffer.alloc(0);
+    const chunks: Buffer[] = [];
 
-    stream.on('data', (chunk: Buffer) => {
-      buffer = Buffer.concat([buffer, chunk]);
-    });
-    stream.on('end', () => {
-      resolve(buffer);
-    });
-
+    stream.on('data', (chunk: Buffer) => chunks.push(chunk));
     stream.on('error', (err) => reject(err));
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+  });
+}
+
+function streamFinish(stream: Stream): Promise<void> {
+  return new Promise((resolve, reject) => {
+    stream.on('error', (error) => reject(error));
+    stream.on('finish', () => resolve());
   });
 }

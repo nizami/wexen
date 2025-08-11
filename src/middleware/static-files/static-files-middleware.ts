@@ -1,27 +1,11 @@
-import {
-  HttpMethod,
-  HttpRequest,
-  HttpResponse,
-  HttpStatusCode,
-  Middleware,
-  newFileResponse,
-  newJsonResponse,
-  None,
-} from '#wexen';
+import {HttpMethod, HttpRequest, HttpResponse, Middleware, newFileResponse, None} from '#wexen';
 import {existsSync, statSync} from 'node:fs';
 import {resolve} from 'node:path';
 
 export function staticFilesMiddleware(staticFileDirectories: string[]): Middleware {
   return async (request: HttpRequest): Promise<HttpResponse | None> => {
     if (request.method !== HttpMethod.Get) {
-      const notAllowedResponse = newJsonResponse(
-        {error: 'Method Not Allowed'},
-        HttpStatusCode.MethodNotAllowed,
-      );
-
-      notAllowedResponse.headers['allow'] = 'GET';
-
-      return notAllowedResponse;
+      return null;
     }
 
     const requestPath = request.url.pathname.slice(1) || 'index.html';

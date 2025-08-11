@@ -1,27 +1,38 @@
 const contentTypes: Record<string, string> = {
-  html: 'text/html',
   css: 'text/css',
-  js: 'text/javascript',
-  json: 'application/json',
-  png: 'image/png',
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  gif: 'image/gif',
-  svg: 'image/svg+xml',
-  pdf: 'application/pdf',
-  ico: 'image/x-icon',
-  xml: 'application/xml',
-  txt: 'text/plain',
-  mp4: 'video/mp4',
-  mp3: 'audio/mpeg',
-  wav: 'audio/wav',
-  webp: 'image/webp',
   doc: 'application/msword',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  zip: 'application/zip',
+  gif: 'image/gif',
+  html: 'text/html',
+  ico: 'image/x-icon',
+  jpeg: 'image/jpeg',
+  jpg: 'image/jpeg',
+  js: 'text/javascript',
+  json: 'application/json',
+  jsonc: 'application/json',
+  mp3: 'audio/mpeg',
+  mp4: 'video/mp4',
+  pdf: 'application/pdf',
+  png: 'image/png',
+  svg: 'image/svg+xml',
+  txt: 'text/plain',
+  wav: 'audio/wav',
+  webp: 'image/webp',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  xml: 'application/xml',
+  zip: 'application/zip',
 };
 
-export function contentTypeFromExtension(extension: string): string {
+export function contentTypeByFileExtension(extension: string): string {
   return contentTypes[extension] ?? 'application/octet-stream';
+}
+
+export function contentTypeByFilePath(path: string): string {
+  const extension = path.split('.').pop()?.toLowerCase();
+
+  if (extension) {
+    return contentTypeByFileExtension(extension);
+  }
+
+  return 'application/octet-stream';
 }

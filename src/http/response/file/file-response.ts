@@ -1,4 +1,4 @@
-import {contentTypeFromExtension, HttpResponse, HttpStatusCode} from '#wexen';
+import {contentTypeByFilePath, HttpResponse, HttpStatusCode} from '#wexen';
 import {readFileSync} from 'node:fs';
 import {gzip} from 'zlib';
 
@@ -36,8 +36,7 @@ export function newFileResponse(filePath: string, statusCode = HttpStatusCode.Ok
           stream.end(compressedData);
         });
       } else {
-        const pathExtension = this.filePath.split('.').pop()?.toLowerCase() || '';
-        const contentType = contentTypeFromExtension(pathExtension);
+        const contentType = contentTypeByFilePath(this.filePath);
         this.headers['content-type'] = contentType;
         stream.respond(this.headers);
         stream.end(fileContent);

@@ -1,4 +1,5 @@
 import {HttpMethod, None} from '#wexen';
+import {WriteStream} from 'node:fs';
 import {Http2Session, IncomingHttpHeaders} from 'node:http2';
 
 export type HttpRequest = {
@@ -10,4 +11,11 @@ export type HttpRequest = {
   data(): Promise<Buffer>;
   text(): Promise<string>;
   json(): Promise<unknown>;
+  file(cb: (fileName: string) => WriteStream): Promise<FileRequestInfo>;
+};
+
+export type FileRequestInfo = {
+  name: string;
+  size: number;
+  type: string;
 };
