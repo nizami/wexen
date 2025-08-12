@@ -1,8 +1,5 @@
-import {None} from '#wexen';
-
-export function joinUrl(...parts: (string | None)[]): string {
+export function joinUrl(...parts: string[]): string {
   return parts
-    .flatMap((x) => x?.split('/'))
-    .filter((x) => !!x)
+    .flatMap((x) => x.split('/'))
     .join('/');
 }

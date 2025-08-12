@@ -19,7 +19,7 @@ import {networkInterfaces} from 'node:os';
 
 export function runWebServer(config: WebServerConfig): Http2Server {
   logger.info(`Web server is running:`, TerminalColor.FG_GREEN);
-  logger.info(`-`.repeat(24));
+  logger.info(`-`.repeat('https://000.000.000.000:65536'.length));
 
   const server = createSecureServer(config);
 
@@ -42,16 +42,20 @@ function onServerStream(config: WebServerConfig) {
       const statusCode = response.headers[':status'];
       const logLevel = isSuccessfulStatusCode(statusCode) ? LogLevel.Info : LogLevel.Error;
       logRequest(logLevel, request, statusCode, humanizedTime);
-    } catch (err: any) {
-      const error =
-        err instanceof HttpError ? err : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
+    } catch (error: any) {
+      error =
+        error instanceof HttpError
+          ? error
+          : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
 
       const response = newJsonResponse({error: error.message}, error.statusCode);
       await response.send(stream, request);
 
       const statusCode = response.headers[':status'];
       const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
-      logRequest(LogLevel.Error, request, statusCode, `${humanizedTime}\n${String(err['stack'] ?? err)}`);
+      logRequest(LogLevel.Error, request, statusCode, `${humanizedTime}\n${String(error['stack'] ?? error)}`);
+
+      throw error;
     }
   };
 }
