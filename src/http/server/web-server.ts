@@ -43,19 +43,14 @@ function onServerStream(config: WebServerConfig) {
       const logLevel = isSuccessfulStatusCode(statusCode) ? LogLevel.Info : LogLevel.Error;
       logRequest(logLevel, request, statusCode, humanizedTime);
     } catch (error: any) {
-      error =
-        error instanceof HttpError
-          ? error
-          : new HttpError(HttpStatusCode.InternalServerError, 'Internal Error');
+      const message = error instanceof HttpError ? error.message : 'Internal Error';
+      const statusCode = error instanceof HttpError ? error.statusCode : HttpStatusCode.InternalServerError;
 
-      const response = newJsonResponse({error: error.message}, error.statusCode);
+      const response = newJsonResponse({error: message}, statusCode);
       await response.send(stream, request);
 
-      const statusCode = response.headers[':status'];
       const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
       logRequest(LogLevel.Error, request, statusCode, `${humanizedTime}\n${String(error['stack'] ?? error)}`);
-
-      throw error;
     }
   };
 }
