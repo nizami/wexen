@@ -35,6 +35,13 @@ function onServerStream(config: WebServerConfig) {
 
     try {
       const response = await middlewareResponse(middlewares, request);
+
+      const origin = request.headers['origin'];
+
+      if (origin && config.origins?.includes(origin)) {
+        response.headers['access-control-allow-origin'] = origin;
+      }
+
       await response.send(stream, request);
 
       const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);

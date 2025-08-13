@@ -33,7 +33,7 @@ export function prepareControllers(
   }
 
   for (const controller of controllers) {
-    const path = '/' + joinUrl(parentPath, controller.path).toLowerCase();
+    const path = '/' + joinUrl(parentPath, controller.path ?? '').toLowerCase();
 
     if (controller.middlewares?.length) {
       result[path] ??= [];
