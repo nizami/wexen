@@ -40,16 +40,14 @@ export function newHttpRequest(stream: ServerHttp2Stream, headers: IncomingHttpH
 
     async file(cb: (fileName: string) => WriteStream): Promise<FileRequestInfo> {
       const fileName = headers['x-filename']?.toString() ?? crypto.randomUUID();
-
       const outputStream = cb(fileName);
       stream.pipe(outputStream);
-      await streamFinish(outputStream);
 
-      const contentType = this.headers['content-type'];
+      await streamFinish(outputStream);
 
       return {
         name: fileName,
-        type: contentType ?? contentTypeByFilePath(fileName),
+        type: contentTypeByFilePath(fileName),
         size: outputStream.bytesWritten,
       };
     },
