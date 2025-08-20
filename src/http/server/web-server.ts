@@ -17,9 +17,11 @@ import {
 import {createSecureServer, Http2Server, IncomingHttpHeaders, ServerHttp2Stream} from 'node:http2';
 import {networkInterfaces} from 'node:os';
 
+const DIVIDER = `-`.repeat('https://000.000.000.000:65536'.length);
+
 export function runWebServer(config: WebServerConfig): Http2Server {
   logger.info(`Web server is running:`, TerminalColor.FG_GREEN);
-  logger.info(`-`.repeat('https://000.000.000.000:65536'.length));
+  logger.info(DIVIDER);
 
   const server = createSecureServer(config);
 
@@ -85,7 +87,7 @@ function logListening(config: WebServerConfig): void {
     .filter((x) => x.family === 'IPv4' && !x.internal)
     .forEach((x) => logger.info(`https://${x.address}:${config.port}`));
 
-  logger.info(`-`.repeat(24));
+  logger.info(DIVIDER);
 }
 
 function isSuccessfulStatusCode(statusCode: HttpStatusCode): boolean {
