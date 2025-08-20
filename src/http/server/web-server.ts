@@ -3,11 +3,8 @@ import {
   HttpRequest,
   HttpResponse,
   HttpStatusCode,
-  humanizeTime,
   logger,
-  LogLevel,
   logRequest,
-  Middleware,
   newHttpRequest,
   newJsonResponse,
   newNotFoundResponse,
@@ -29,43 +26,32 @@ export function runWebServer(config: WebServerConfig): Http2Server {
 }
 
 function onServerStream(config: WebServerConfig) {
-  const middlewares = [...(config.middlewares ?? [])];
-
   return async (stream: ServerHttp2Stream, headers: IncomingHttpHeaders) => {
     const performanceTime = process.hrtime.bigint();
     const request = newHttpRequest(stream, headers);
 
     try {
-      const response = await middlewareResponse(middlewares, request);
-
-      const origin = request.headers['origin'];
-
-      if (origin && config.origins?.includes(origin)) {
-        response.headers['access-control-allow-origin'] = origin;
-      }
-
+      const response = await middlewareResponse(config, request);
+      addCors(config, request, response);
       await response.send(stream, request);
 
-      const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
-
-      const statusCode = response.headers[':status'];
-      const logLevel = isSuccessfulStatusCode(statusCode) ? LogLevel.Info : LogLevel.Error;
-      logRequest(logLevel, request, statusCode, humanizedTime);
+      logRequest(request, response, performanceTime);
     } catch (error: any) {
-      const message = error instanceof HttpError ? error.message : 'Internal Error';
-      const statusCode = error instanceof HttpError ? error.statusCode : HttpStatusCode.InternalServerError;
-
-      const response = newJsonResponse({error: message}, statusCode);
+      const response = errorResponse(error);
+      addCors(config, request, response);
       await response.send(stream, request);
 
-      const humanizedTime = humanizeTime(process.hrtime.bigint() - performanceTime);
-      logRequest(LogLevel.Error, request, statusCode, `${humanizedTime}\n${String(error['stack'] ?? error)}`);
+      logRequest(request, response, performanceTime, `\n${String(error['stack'] ?? error)}`);
     }
   };
 }
 
-async function middlewareResponse(middlewares: Middleware[], request: HttpRequest): Promise<HttpResponse> {
-  for (const middleware of middlewares) {
+async function middlewareResponse(config: WebServerConfig, request: HttpRequest): Promise<HttpResponse> {
+  if (!config.middlewares?.length) {
+    throw new HttpError(HttpStatusCode.InternalServerError, 'Middlewares Not Found');
+  }
+
+  for (const middleware of config.middlewares) {
     const response = await middleware(request);
 
     if (response) {
@@ -74,6 +60,21 @@ async function middlewareResponse(middlewares: Middleware[], request: HttpReques
   }
 
   return newNotFoundResponse();
+}
+
+function errorResponse(error: unknown): HttpResponse {
+  const message = error instanceof HttpError ? error.message : 'Internal Error';
+  const statusCode = error instanceof HttpError ? error.statusCode : HttpStatusCode.InternalServerError;
+
+  return newJsonResponse({error: message}, statusCode);
+}
+
+function addCors(config: WebServerConfig, request: HttpRequest, response: HttpResponse) {
+  const origin = request.headers['origin'];
+
+  if (origin && config.origins?.includes(origin)) {
+    response.headers['access-control-allow-origin'] = origin;
+  }
 }
 
 function logListening(config: WebServerConfig): void {
@@ -88,8 +89,4 @@ function logListening(config: WebServerConfig): void {
     .forEach((x) => logger.info(`https://${x.address}:${config.port}`));
 
   logger.info(DIVIDER);
-}
-
-function isSuccessfulStatusCode(statusCode: HttpStatusCode): boolean {
-  return statusCode >= 200 && statusCode < 300;
 }
