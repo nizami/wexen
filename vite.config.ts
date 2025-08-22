@@ -20,7 +20,7 @@ export default defineConfig({
       name: 'wexen',
       formats: ['es'],
       entry: resolve(WORKSPACE_ROOT, 'src/index.ts'),
-      fileName: () => `index.js`,
+      fileName: () => 'index.js',
     },
     rollupOptions: {
       cache: false,

@@ -1,4 +1,4 @@
-import {HttpMethod, HttpResponse, HttpStatusCode, Middleware} from 'wexen';
+import {HttpMethod, HttpResponse, HttpStatusCode, Middleware} from '#wexen';
 
 export function corsMiddleware(origins: string[]): Middleware {
   return async (request) => {

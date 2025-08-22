@@ -32,7 +32,8 @@
     "Server"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "name": "wexen",
   "repository": {
     "type": "git",
