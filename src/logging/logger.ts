@@ -1,5 +1,4 @@
 import {LogLevel, logLevelToTerminalColor, None, terminalColor, TerminalColor} from '#wexen';
-import util from 'node:util';
 
 export const logger = {
   error: (message: string, color?: TerminalColor | None) => {
@@ -26,14 +25,6 @@ export const logger = {
     console.log(logFormat(LogLevel.Silly, message, color).join(' '));
   },
 };
-
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:\n' + util.format(error));
-});
-
-process.on('unhandledRejection', (reason) => {
-  logger.error('Unhandled Rejection:\n' + util.format(reason));
-});
 
 // let performanceTime = performance.now();
 
