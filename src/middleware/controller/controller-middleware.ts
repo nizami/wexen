@@ -1,48 +1,25 @@
-import {Controller, HttpRequest, HttpResponse, joinUrl, Middleware, None} from '#wexen';
+import {Controller, HttpMethod, HttpRequest, HttpResponse, Middleware, None, Route} from '#wexen';
+
+export type RoutesMap = Record<string, Record<HttpMethod, Route>>;
 
 export function controllerMiddleware(controllers: Controller[]): Middleware {
-  const controllerDictionary = prepareControllers(controllers);
+  const preparedRoutes = prepareControllerRoutes(controllers);
 
   return async (request: HttpRequest): Promise<HttpResponse | None> => {
-    const requestPath = request.url.pathname?.toLowerCase() ?? '';
-    const middlewares: Middleware[] | None = controllerDictionary[requestPath];
+    const path = request.url.pathname.toLowerCase();
+    const route = preparedRoutes[path]?.[request.method];
 
-    if (!middlewares) {
-      return null;
-    }
-
-    for (const middleware of middlewares) {
-      const result = await middleware(request);
-
-      if (result != null) {
-        return result;
-      }
-    }
-
-    return null;
+    return route.middleware(request);
   };
 }
 
-export function prepareControllers(
-  controllers: Controller[] | None,
-  parentPath: string = '',
-  result: Record<string, Middleware[]> = {},
-): Record<string, Middleware[]> {
-  if (!controllers?.length) {
-    return result;
-  }
+export function prepareControllerRoutes(controllers: Controller[]): RoutesMap {
+  const result: RoutesMap = {};
 
-  for (const controller of controllers) {
-    const path = '/' + joinUrl(parentPath, controller.path ?? '').toLowerCase();
-
-    if (controller.middlewares?.length) {
-      result[path] ??= [];
-      result[path].push(...controller.middlewares);
-    }
-
-    if (controller.children) {
-      prepareControllers(controller.children, path, result);
-    }
+  for (const route of controllers.flatMap((x) => x.routes)) {
+    const path = route.path.toLowerCase();
+    result[path] ??= {} as Record<HttpMethod, Route>;
+    result[path][route.method] ??= route;
   }
 
   return result;

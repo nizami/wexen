@@ -4,7 +4,7 @@ import {Http2Session, IncomingHttpHeaders} from 'node:http2';
 
 export type HttpRequest = {
   session?: Http2Session | None;
-  method?: HttpMethod | None;
+  method: HttpMethod;
   headers: IncomingHttpHeaders;
   url: URL;
 

@@ -1,4 +1,3 @@
-export * from './controller/controller';
 export * from './http/error/http-error';
 export * from './http/http-method';
 export * from './http/http-status-code';
@@ -19,10 +18,11 @@ export * from './logging/log-level';
 export * from './logging/log-request';
 export * from './logging/logger';
 export * from './middleware/controller/controller-middleware';
+export * from './middleware/controller/controller';
 export * from './middleware/cors/cors-middleware';
 export * from './middleware/middleware';
-export * from './middleware/route/route-middleware';
 export * from './middleware/static-files/static-files-middleware';
+export * from './route/route';
 export * from './typing';
 export * from './util/array';
 export * from './util/humanize-time/humanize-time';

@@ -11,7 +11,7 @@ export function newHttpRequest(stream: ServerHttp2Stream, headers: IncomingHttpH
 
   return {
     session: stream.session,
-    method: headers[':method'] as HttpMethod | None,
+    method: headers[':method'] as HttpMethod ?? HttpMethod.Unknown,
     headers,
 
     get url(): URL {
