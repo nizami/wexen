@@ -1,26 +1,39 @@
-import {Controller, HttpMethod, HttpRequest, HttpResponse, Middleware, None, Route} from '#wexen';
-
-export type RoutesMap = Record<string, Record<HttpMethod, Route>>;
+import {Controller, HttpRequest, HttpResponse, Middleware, None, ROUTES_MAP} from '#wexen';
 
 export function controllerMiddleware(controllers: Controller[]): Middleware {
-  const preparedRoutes = prepareControllerRoutes(controllers);
+  bindRouteFunctions(controllers);
 
   return async (request: HttpRequest): Promise<HttpResponse | None> => {
     const path = request.url.pathname.toLowerCase();
-    const route = preparedRoutes[path]?.[request.method];
+    const route = ROUTES_MAP.get(path)?.get(request.method);
 
-    return route.middleware(request);
+    return route?.originalFunction?.(request);
   };
 }
 
-export function prepareControllerRoutes(controllers: Controller[]): RoutesMap {
-  const result: RoutesMap = {};
+function bindRouteFunctions(controllers: Controller[]): void {
+  const controllerFunctions = getControllerFunctionMap(controllers);
 
-  for (const route of controllers.flatMap((x) => x.routes)) {
-    const path = route.path.toLowerCase();
-    result[path] ??= {} as Record<HttpMethod, Route>;
-    result[path][route.method] ??= route;
+  for (const routes of ROUTES_MAP.values()) {
+    for (const route of routes.values()) {
+      const controller = controllerFunctions.get(route.originalFunction);
+
+      if (controller) {
+        route.originalFunction = route.originalFunction.bind(controller);
+      }
+    }
+  }
+}
+
+function getControllerFunctionMap(controllers: any[]): Map<Function, Controller> {
+  const controllerFunctions = new Map<Function, Controller>();
+
+  for (const controller of controllers) {
+    Object.getOwnPropertyNames(Object.getPrototypeOf(controller))
+      .map((x) => controller[x])
+      .filter((x) => typeof x === 'function')
+      .forEach((x) => controllerFunctions.set(x, controller));
   }
 
-  return result;
+  return controllerFunctions;
 }
