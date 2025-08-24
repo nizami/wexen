@@ -9,7 +9,7 @@ export function controllerMiddleware(controllers: Controller[]): Middleware {
     const path = request.url.pathname.toLowerCase();
     const route = preparedRoutes[path]?.[request.method];
 
-    return route.middleware(request);
+    return route?.middleware(request);
   };
 }
 
